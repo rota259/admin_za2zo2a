@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "za2zo2a_admin (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "args": [
+        "--web-hostname=localhost",
+        "--web-port=5000",
+        "--dart-define=BASE_URL=http://localhost:3000"
+      ]
+    }
+  ]
+}

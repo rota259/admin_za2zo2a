@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin-web",
+      "runtimeExecutable": "flutter",
+      "runtimeArgs": [
+        "run",
+        "-d",
+        "web-server",
+        "--web-port=5000",
+        "--web-hostname=localhost",
+        "--dart-define=BASE_URL=http://localhost:3000"
+      ],
+      "port": 5000
+    },
+    {
+      "name": "admin-web-release",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5000", "--directory", "build/web"],
+      "port": 5000
+    }
+  ]
+}
