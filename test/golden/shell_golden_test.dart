@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:za2zo2a_admin/core/network/dio_client.dart';
 import 'package:za2zo2a_admin/core/services/session_manager.dart';
 import 'package:za2zo2a_admin/core/theme/app_theme.dart';
+import 'package:za2zo2a_admin/core/util/ambient_motion.dart';
 import 'package:za2zo2a_admin/core/theme/theme_cubit.dart';
 import 'package:za2zo2a_admin/features/auth/cubit/auth_cubit.dart';
 import 'package:za2zo2a_admin/features/auth/data/models/admin_model.dart';
@@ -25,15 +26,17 @@ import 'package:za2zo2a_admin/features/shell/views/admin_shell.dart';
 class _SeededAuthCubit extends AuthCubit {
   _SeededAuthCubit(super.repo);
 
-  void seed() => emit(const AuthState(
-        status: AuthStatus.authenticated,
-        admin: AdminModel(
-          id: '6a5517048b362575a4309c12',
-          name: 'System Admin',
-          email: 'admin@za2zoo2a.com',
-          role: 'admin',
-        ),
-      ));
+  void seed() => emit(
+    const AuthState(
+      status: AuthStatus.authenticated,
+      admin: AdminModel(
+        id: '6a5517048b362575a4309c12',
+        name: 'System Admin',
+        email: 'admin@za2zoo2a.com',
+        role: 'admin',
+      ),
+    ),
+  );
 }
 
 /// Seeds the sidebar badge counts without hitting the network.
@@ -71,14 +74,15 @@ Future<void> _loadBundledFonts() async {
 
 void main() {
   setUpAll(() async {
+    AmbientMotion.enabled = false;
     await _loadBundledFonts();
     // Pin the greeting so the golden doesn't drift with the wall clock.
     DashboardHeader.clock = () => DateTime(2026, 7, 18, 14);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
-      (call) async => call.method == 'readAll' ? <String, String>{} : null,
-    );
+          const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+          (call) async => call.method == 'readAll' ? <String, String>{} : null,
+        );
   });
 
   tearDownAll(() => DashboardHeader.clock = DateTime.now);
@@ -149,8 +153,9 @@ void main() {
     );
   });
 
-  testWidgets('shell — tablet (sidebar force-collapsed to icons)',
-      (tester) async {
+  testWidgets('shell — tablet (sidebar force-collapsed to icons)', (
+    tester,
+  ) async {
     await renderShell(
       tester,
       const Size(1000, 800),

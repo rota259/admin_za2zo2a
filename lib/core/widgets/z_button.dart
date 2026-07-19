@@ -39,6 +39,7 @@ class ZButton extends StatefulWidget {
 
 class _ZButtonState extends State<ZButton> {
   bool _hovered = false;
+  bool _pressed = false;
 
   bool get _enabled => widget.onPressed != null && !widget.loading;
 
@@ -58,9 +59,21 @@ class _ZButtonState extends State<ZButton> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       cursor: _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
-      child: Opacity(
-        opacity: _enabled ? 1 : 0.55,
-        child: AnimatedContainer(
+      child: Listener(
+        onPointerDown:
+            _enabled ? (_) => setState(() => _pressed = true) : null,
+        onPointerUp:
+            _enabled ? (_) => setState(() => _pressed = false) : null,
+        onPointerCancel:
+            _enabled ? (_) => setState(() => _pressed = false) : null,
+        child: AnimatedScale(
+          // A small dip on press for tactile feedback.
+          scale: _pressed && _enabled ? 0.97 : 1.0,
+          duration: const Duration(milliseconds: 90),
+          curve: Curves.easeOut,
+          child: Opacity(
+            opacity: _enabled ? 1 : 0.55,
+            child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           // Hover lifts the button 1px, per the design's translateY(-1px).
           transform: Matrix4.translationValues(
@@ -126,27 +139,43 @@ class _ZButtonState extends State<ZButton> {
             ),
           ),
         ),
+          ),
+        ),
       ),
     );
   }
 
-  /// `box-shadow: 0 8px 20px -6px rgba(232,25,75,.5)` — accent variants only.
+  /// `box-shadow: 0 8px 20px -6px rgba(232,25,75,.5)` — accent variants carry
+  /// it at rest and it blooms on hover; secondary/ghost pick up a soft accent
+  /// glow only under the cursor, matching the card hover treatment.
   List<BoxShadow>? _glow(AppTokens t) {
     if (!_enabled) return null;
-    final color = switch (widget.variant) {
-      ZButtonVariant.primary => t.accent,
-      ZButtonVariant.danger => t.danger,
-      _ => null,
-    };
-    if (color == null) return null;
-    return [
-      BoxShadow(
-        color: color.withValues(alpha: 0.5),
-        blurRadius: 20,
-        spreadRadius: -6,
-        offset: const Offset(0, 8),
-      ),
-    ];
+    final hovered = _hovered;
+    switch (widget.variant) {
+      case ZButtonVariant.primary:
+      case ZButtonVariant.danger:
+        final color =
+            widget.variant == ZButtonVariant.primary ? t.accent : t.danger;
+        return [
+          BoxShadow(
+            color: color.withValues(alpha: hovered ? 0.62 : 0.5),
+            blurRadius: hovered ? 30 : 20,
+            spreadRadius: hovered ? -3 : -6,
+            offset: const Offset(0, 8),
+          ),
+        ];
+      case ZButtonVariant.secondary:
+      case ZButtonVariant.ghost:
+        if (!hovered) return null;
+        return [
+          BoxShadow(
+            color: t.accent.withValues(alpha: 0.16),
+            blurRadius: 22,
+            spreadRadius: -6,
+            offset: const Offset(0, 6),
+          ),
+        ];
+    }
   }
 
   Color _background(AppTokens t) => switch (widget.variant) {

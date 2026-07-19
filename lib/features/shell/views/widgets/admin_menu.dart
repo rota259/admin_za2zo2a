@@ -21,64 +21,68 @@ class AdminMenu extends StatelessWidget {
     final t = context.tokens;
     final theme = Theme.of(context);
 
-    return PopupMenuButton<String>(
-      tooltip: 'Account',
-      offset: const Offset(0, 52),
-      color: t.surface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(13),
-        side: BorderSide(color: t.border),
+    // MenuAnchor (not PopupMenuButton): its MenuItemButton.onPressed fires
+    // reliably. The old popup silently dropped the Sign-out tap to its barrier.
+    return MenuAnchor(
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(t.surface),
+        elevation: const WidgetStatePropertyAll(0),
+        padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 6)),
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(13),
+          side: BorderSide(color: t.border),
+        )),
       ),
-      constraints: const BoxConstraints(minWidth: 210, maxWidth: 210),
-      onSelected: (v) {
-        if (v == 'logout') context.read<AuthCubit>().logout();
-      },
-      itemBuilder: (context) => [
-        _item(context, 'settings', 'Account settings', Icons.manage_accounts_outlined,
+      alignmentOffset: const Offset(0, 6),
+      menuChildren: [
+        _item(context, 'Account settings', Icons.manage_accounts_outlined,
             enabled: false),
-        _item(context, 'activity', 'Activity log', Icons.receipt_long_outlined,
+        _item(context, 'Activity log', Icons.receipt_long_outlined,
             enabled: false),
-        _item(context, 'logout', 'Sign out', Icons.logout,
-            color: t.accentText),
+        _item(context, 'Sign out', Icons.logout,
+            color: t.accentText,
+            onTap: () => context.read<AuthCubit>().logout()),
       ],
-      child: _ProfileTrigger(admin: admin, theme: theme, t: t),
+      builder: (context, controller, child) => GestureDetector(
+        onTap: () =>
+            controller.isOpen ? controller.close() : controller.open(),
+        child: _ProfileTrigger(admin: admin, theme: theme, t: t),
+      ),
     );
   }
 
   /// Settings and Activity log have no backend endpoints yet, so they're
   /// present-but-inert with an explanatory tooltip rather than dead links.
-  PopupMenuItem<String> _item(
+  Widget _item(
     BuildContext context,
-    String value,
     String label,
     IconData icon, {
     bool enabled = true,
     Color? color,
+    VoidCallback? onTap,
   }) {
     final t = context.tokens;
     final fg = color ?? (enabled ? t.text2 : t.text3);
-    return PopupMenuItem<String>(
-      value: value,
-      enabled: enabled,
-      height: 38,
-      child: Tooltip(
-        message: enabled ? '' : '$label — no backend endpoint yet',
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: fg),
-            const SizedBox(width: AppSpacing.md),
-            Text(
-              label,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: fg, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
+    Widget button = MenuItemButton(
+      onPressed: enabled ? onTap : null,
+      leadingIcon: Icon(icon, size: 16, color: fg),
+      style: MenuItemButton.styleFrom(
+        minimumSize: const Size(210, 38),
+        foregroundColor: fg,
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context)
+            .textTheme
+            .bodyMedium
+            ?.copyWith(color: fg, fontWeight: FontWeight.w500),
       ),
     );
+    if (!enabled) {
+      button =
+          Tooltip(message: '$label — no backend endpoint yet', child: button);
+    }
+    return button;
   }
 }
 

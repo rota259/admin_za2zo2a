@@ -80,7 +80,6 @@ class NavItem {
       path: AppRoutes.notifications,
       label: 'Notifications',
       icon: Icons.campaign_outlined,
-      enabled: false,
     ),
     NavItem(
       path: AppRoutes.settings,

@@ -7,6 +7,7 @@ import '../../features/dashboard/views/dashboard_view.dart';
 import '../../features/approval/views/approval_queue_view.dart';
 import '../../features/drivers/views/driver_detail_view.dart';
 import '../../features/drivers/views/drivers_list_view.dart';
+import '../../features/notifications/views/notifications_view.dart';
 import '../../features/pricing/views/pricing_view.dart';
 import '../../features/selfie/views/selfie_review_view.dart';
 import '../../features/shell/views/admin_shell.dart';
@@ -73,6 +74,11 @@ class AppRouter {
             path: AppRoutes.pricing,
             pageBuilder: (context, state) =>
                 fadeSlidePage(key: state.pageKey, child: const PricingView()),
+          ),
+          GoRoute(
+            path: AppRoutes.notifications,
+            pageBuilder: (context, state) => fadeSlidePage(
+                key: state.pageKey, child: const NotificationsView()),
           ),
         ],
       ),

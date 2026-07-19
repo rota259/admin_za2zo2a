@@ -6,6 +6,7 @@ class DriverDetailState extends Equatable {
   const DriverDetailState({
     this.status = DetailStatus.loading,
     this.driver,
+    this.verification,
     this.error,
     this.busyDoc,
     this.busyBlock = false,
@@ -14,6 +15,9 @@ class DriverDetailState extends Equatable {
 
   final DetailStatus status;
   final DriverModel? driver;
+
+  /// The driver's latest selfie verification, or null if none on record.
+  final DriverVerification? verification;
   final String? error;
 
   /// The document currently being approved/rejected (drives its tile spinner).
@@ -31,6 +35,8 @@ class DriverDetailState extends Equatable {
   DriverDetailState copyWith({
     DetailStatus? status,
     DriverModel? driver,
+    DriverVerification? verification,
+    bool clearVerification = false,
     String? error,
     bool clearError = false,
     DocType? busyDoc,
@@ -41,6 +47,8 @@ class DriverDetailState extends Equatable {
       DriverDetailState(
         status: status ?? this.status,
         driver: driver ?? this.driver,
+        verification:
+            clearVerification ? null : (verification ?? this.verification),
         error: clearError ? null : (error ?? this.error),
         busyDoc: clearBusyDoc ? null : (busyDoc ?? this.busyDoc),
         busyBlock: busyBlock ?? this.busyBlock,
@@ -49,5 +57,5 @@ class DriverDetailState extends Equatable {
 
   @override
   List<Object?> get props =>
-      [status, driver, error, busyDoc, busyBlock, busyApproveAll];
+      [status, driver, verification, error, busyDoc, busyBlock, busyApproveAll];
 }

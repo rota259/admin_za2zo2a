@@ -1,38 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description"
+        content="Za2zo2a operator console — manage drivers, approvals, selfie checks and pricing.">
+  <meta name="theme-color" content="#E8194B">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="za2zo2a_admin">
+  <meta name="apple-mobile-web-app-title" content="Za2zo2a Operator Console">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Crimson "Z" mark. SVG favicon (modern browsers), PNG fallback. -->
+  <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23e8194b'/%3E%3Cstop offset='1' stop-color='%23a30d31'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Ctext x='16' y='23' font-family='Arial,sans-serif' font-size='20' font-weight='700' fill='%23fff' text-anchor='middle'%3EZ%3C/text%3E%3C/svg%3E"/>
+  <link rel="alternate icon" type="image/png" href="favicon.png"/>
 
-  <title>za2zo2a_admin</title>
+  <title>Za2zo2a Operator Console</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Branded boot splash — shown instantly, before the Flutter bundle loads,
+       and faded out on the app's first frame. Self-contained (no network). */
+    html, body { margin: 0; padding: 0; height: 100%; background: #f6f6f4; }
+    @media (prefers-color-scheme: dark) {
+      html, body { background: #0d0d10; }
+    }
+    #boot {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 22px;
+      background: #f6f6f4;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      transition: opacity .35s ease;
+    }
+    @media (prefers-color-scheme: dark) { #boot { background: #0d0d10; } }
+    #boot.hide { opacity: 0; pointer-events: none; }
+    #boot .mark {
+      width: 62px; height: 62px; border-radius: 18px;
+      background: linear-gradient(150deg, #e8194b, #a30d31);
+      box-shadow: 0 12px 30px -8px rgba(232, 25, 75, .55);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -.02em;
+    }
+    #boot .name {
+      font-size: 15px; font-weight: 600; color: #67676d; letter-spacing: .2px;
+    }
+    @media (prefers-color-scheme: dark) { #boot .name { color: #a1a1aa; } }
+    #boot .spinner {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 3px solid rgba(232, 25, 75, .18);
+      border-top-color: #e8194b;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
+  <div id="boot">
+    <div class="mark">Z</div>
+    <div class="spinner"></div>
+    <div class="name">Za2zo2a Operator Console</div>
+  </div>
+
+  <script>
+    // Remove the splash once Flutter paints its first frame (with fallbacks so
+    // it never lingers or hides an error).
+    (function () {
+      var removed = false;
+      function hide() {
+        if (removed) return;
+        removed = true;
+        var el = document.getElementById('boot');
+        if (!el) return;
+        el.classList.add('hide');
+        setTimeout(function () { el.remove(); }, 400);
+      }
+      window.addEventListener('flutter-first-frame', hide);
+      // Fallback: watch for the Flutter view mounting.
+      var obs = new MutationObserver(function () {
+        if (document.querySelector('flutter-view, flt-glass-pane')) {
+          hide();
+          obs.disconnect();
+        }
+      });
+      obs.observe(document.body, { childList: true, subtree: true });
+      // Hard fallback so the splash can't get stuck.
+      setTimeout(hide, 12000);
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

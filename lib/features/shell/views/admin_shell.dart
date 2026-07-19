@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/widgets/cursor_glow.dart';
 import '../cubit/shell_cubit.dart';
 import 'widgets/app_sidebar.dart';
 import 'widgets/app_top_bar.dart';
@@ -80,7 +81,16 @@ class AdminShell extends StatelessWidget {
                           ? () => scaffoldKey.currentState?.openDrawer()
                           : null,
                     ),
-                    Expanded(child: child),
+                    // Site-wide ambient glow that trails the cursor behind
+                    // every screen's content. Kept very low-opacity so tables
+                    // and forms stay perfectly readable.
+                    Expanded(
+                      child: CursorGlow(
+                        color: t.accent,
+                        opacity: 0.10,
+                        child: child,
+                      ),
+                    ),
                   ],
                 ),
               ),

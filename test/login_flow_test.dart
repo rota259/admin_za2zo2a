@@ -8,6 +8,7 @@ import 'package:za2zo2a_admin/core/network/dio_client.dart';
 import 'package:za2zo2a_admin/core/router/app_router.dart';
 import 'package:za2zo2a_admin/core/services/session_manager.dart';
 import 'package:za2zo2a_admin/core/theme/app_theme.dart';
+import 'package:za2zo2a_admin/core/util/ambient_motion.dart';
 import 'package:za2zo2a_admin/core/theme/theme_cubit.dart';
 import 'package:za2zo2a_admin/features/auth/cubit/auth_cubit.dart';
 import 'package:za2zo2a_admin/features/auth/data/models/admin_model.dart';
@@ -86,7 +87,8 @@ Future<void> _loadBundledFonts() async {
       final file = File(path);
       if (file.existsSync()) {
         loader.addFont(
-            Future.value(ByteData.view(file.readAsBytesSync().buffer)));
+          Future.value(ByteData.view(file.readAsBytesSync().buffer)),
+        );
       }
     }
     await loader.load();
@@ -95,12 +97,13 @@ Future<void> _loadBundledFonts() async {
 
 void main() {
   setUpAll(() async {
+    AmbientMotion.enabled = false;
     await _loadBundledFonts();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
-      (call) async => call.method == 'readAll' ? <String, String>{} : null,
-    );
+          const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+          (call) async => call.method == 'readAll' ? <String, String>{} : null,
+        );
   });
 
   /// Mirrors main.dart's widget wiring: providers + the badge-priming listener
@@ -147,7 +150,9 @@ void main() {
     // Resolve status before the guard evaluates (unauthenticated here).
     await auth.bootstrap();
 
-    await tester.pumpWidget(buildApp(auth: auth, counts: counts, router: router));
+    await tester.pumpWidget(
+      buildApp(auth: auth, counts: counts, router: router),
+    );
     await tester.pumpAndSettle();
 
     // Starts on the login screen.
@@ -159,10 +164,16 @@ void main() {
     await tester.pumpAndSettle();
 
     // The shell must now be rendered and the login screen gone.
-    expect(find.byType(LoginView), findsNothing,
-        reason: 'LoginView should be removed after a successful login');
-    expect(find.byType(AdminShell), findsOneWidget,
-        reason: 'AdminShell should render after the login redirect');
+    expect(
+      find.byType(LoginView),
+      findsNothing,
+      reason: 'LoginView should be removed after a successful login',
+    );
+    expect(
+      find.byType(AdminShell),
+      findsOneWidget,
+      reason: 'AdminShell should render after the login redirect',
+    );
     expect(find.byType(DashboardView), findsOneWidget);
   });
 
@@ -179,7 +190,9 @@ void main() {
     final router = AppRouter(auth);
     await auth.bootstrap();
 
-    await tester.pumpWidget(buildApp(auth: auth, counts: counts, router: router));
+    await tester.pumpWidget(
+      buildApp(auth: auth, counts: counts, router: router),
+    );
     await auth.login('admin@za2zoo2a.com', 'Admin@123456');
     await tester.pumpAndSettle();
     expect(find.byType(AdminShell), findsOneWidget);

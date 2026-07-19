@@ -8,9 +8,10 @@ import '../../../../core/widgets/z_card.dart';
 import '../../../../core/widgets/z_reason_dialog.dart';
 import '../../cubit/driver_detail_cubit.dart';
 import '../../data/models/driver_model.dart';
+import 'verification_card.dart';
 
-/// The detail screen's right column: vehicle facts + the block/unblock
-/// "danger zone".
+/// The detail screen's right column: vehicle facts, selfie verification, and
+/// the block/unblock "danger zone".
 class DriverSideCards extends StatelessWidget {
   const DriverSideCards({
     super.key,
@@ -28,6 +29,8 @@ class DriverSideCards extends StatelessWidget {
     return Column(
       children: [
         _VehicleCard(driver: driver),
+        const SizedBox(height: AppSpacing.lg),
+        VerificationCard(verification: state.verification),
         const SizedBox(height: AppSpacing.lg),
         _DangerZone(driver: driver, state: state, cubit: cubit),
       ],

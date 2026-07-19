@@ -9,6 +9,7 @@ import 'package:za2zo2a_admin/core/services/session_manager.dart';
 import 'package:za2zo2a_admin/core/theme/app_theme.dart';
 import 'package:za2zo2a_admin/features/drivers/cubit/drivers_list_cubit.dart';
 import 'package:za2zo2a_admin/features/drivers/data/models/driver_model.dart';
+import 'package:za2zo2a_admin/features/drivers/data/models/driver_verification.dart';
 import 'package:za2zo2a_admin/features/drivers/data/repos/drivers_repo.dart';
 import 'package:za2zo2a_admin/features/drivers/views/driver_detail_view.dart';
 import 'package:za2zo2a_admin/features/drivers/views/drivers_list_view.dart';
@@ -83,18 +84,24 @@ class _FakeDriversRepo extends DriversRepo {
       const DriverCounts(all: 22, pending: 21, blocked: 1);
 
   @override
-  Future<DriverModel> detail(String id) async =>
-      DriverModel.fromJson(_driver(
-        id: '3',
-        name: 'Karim Adel',
-        phone: '01099887766',
-        tier: 'standard',
-        rating: 4.5,
-        trips: 96,
-        make: 'Kia',
-        model: 'Cerato',
-        license: 'pending',
-      ));
+  Future<DriverDetailData> detail(String id) async => DriverDetailData(
+        driver: DriverModel.fromJson(_driver(
+          id: '3',
+          name: 'Karim Adel',
+          phone: '01099887766',
+          tier: 'standard',
+          rating: 4.5,
+          trips: 96,
+          make: 'Kia',
+          model: 'Cerato',
+          license: 'pending',
+        )),
+        verification: DriverVerification(
+          status: 'approved',
+          submittedAt: DateTime(2026, 7, 15, 11, 40),
+          reviewedAt: DateTime(2026, 7, 15, 14, 48),
+        ),
+      );
 }
 
 Future<void> _loadFonts() async {
@@ -135,14 +142,15 @@ void main() {
 
   tearDownAll(() => GetIt.instance.reset());
 
-  Future<void> pump(WidgetTester tester, Widget child, Size size) async {
+  Future<void> pump(WidgetTester tester, Widget child, Size size,
+      {ThemeData? theme}) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: theme ?? AppTheme.light(),
       home: Scaffold(body: child),
     ));
     await tester.pumpAndSettle();
@@ -159,5 +167,27 @@ void main() {
         const Size(1180, 1000));
     await expectLater(find.byType(DriverDetailView),
         matchesGoldenFile('driver_detail_light.png'));
+  });
+
+  testWidgets('drivers list — desktop dark', (tester) async {
+    await pump(tester, const DriversListView(), const Size(1180, 900),
+        theme: AppTheme.dark());
+    await expectLater(find.byType(DriversListView),
+        matchesGoldenFile('drivers_list_dark.png'));
+  });
+
+  testWidgets('driver detail — desktop dark', (tester) async {
+    await pump(tester, const DriverDetailView(driverId: '3'),
+        const Size(1180, 1000), theme: AppTheme.dark());
+    await expectLater(find.byType(DriverDetailView),
+        matchesGoldenFile('driver_detail_dark.png'));
+  });
+
+  // Responsive proof: at a narrow width the table drops low-priority columns
+  // (Vehicle, Tier, …) rather than breaking layout or overflowing.
+  testWidgets('drivers list — narrow (responsive columns)', (tester) async {
+    await pump(tester, const DriversListView(), const Size(680, 900));
+    await expectLater(find.byType(DriversListView),
+        matchesGoldenFile('drivers_list_narrow.png'));
   });
 }

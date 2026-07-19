@@ -127,22 +127,27 @@ class DocumentTile extends StatelessWidget {
         ),
       );
     }
+    // Both actions stay available regardless of the current decision, so an
+    // admin can re-review and flip an already-approved/rejected document (the
+    // backend accepts the change; the status badge shows where it stands).
     return Row(
       children: [
         Expanded(
           child: _ActionButton(
-            label: 'Approve',
+            label: document.isApproved ? 'Approved' : 'Approve',
             tone: context.tokens.green,
-            enabled: actionsEnabled && !document.isApproved,
+            enabled: actionsEnabled,
+            filled: document.isApproved,
             onTap: onApprove,
           ),
         ),
         const SizedBox(width: 7),
         Expanded(
           child: _ActionButton(
-            label: 'Reject',
+            label: document.isRejected ? 'Rejected' : 'Reject',
             tone: context.tokens.danger,
-            enabled: actionsEnabled && !document.isRejected,
+            enabled: actionsEnabled,
+            filled: document.isRejected,
             onTap: onReject,
           ),
         ),
@@ -157,6 +162,7 @@ class _ActionButton extends StatelessWidget {
     required this.tone,
     required this.enabled,
     required this.onTap,
+    this.filled = false,
   });
 
   final String label;
@@ -164,12 +170,16 @@ class _ActionButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback onTap;
 
+  /// Solid fill when this is the document's current decision.
+  final bool filled;
+
   @override
   Widget build(BuildContext context) {
+    final fg = filled ? Colors.white : tone;
     return Opacity(
       opacity: enabled ? 1 : 0.4,
       child: Material(
-        color: tone.withValues(alpha: 0.1),
+        color: filled ? tone : tone.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadii.sm),
         child: InkWell(
           onTap: enabled ? onTap : null,
@@ -180,7 +190,7 @@ class _ActionButton extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: tone,
+                    color: fg,
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                   ),

@@ -16,6 +16,7 @@ class ZTextField extends StatelessWidget {
     this.enabled = true,
     this.autofocus = false,
     this.onSubmitted,
+    this.onChanged,
     this.keyboardType,
     this.trailing,
   });
@@ -28,6 +29,7 @@ class ZTextField extends StatelessWidget {
   final bool enabled;
   final bool autofocus;
   final ValueChanged<String>? onSubmitted;
+  final ValueChanged<String>? onChanged;
   final TextInputType? keyboardType;
   final Widget? trailing;
 
@@ -54,6 +56,7 @@ class ZTextField extends StatelessWidget {
             enabled: enabled,
             autofocus: autofocus,
             onSubmitted: onSubmitted,
+            onChanged: onChanged,
             keyboardType: keyboardType,
             style: theme.textTheme.bodyLarge,
             cursorColor: t.accent,

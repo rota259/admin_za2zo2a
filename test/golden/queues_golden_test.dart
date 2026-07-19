@@ -130,7 +130,8 @@ void main() {
 
   tearDownAll(() => GetIt.instance.reset());
 
-  Future<void> pump(WidgetTester tester, Widget child, Size size) async {
+  Future<void> pump(WidgetTester tester, Widget child, Size size,
+      {ThemeData? theme}) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -140,7 +141,7 @@ void main() {
         value: GetIt.instance<NavCountsCubit>(),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.light(),
+          theme: theme ?? AppTheme.light(),
           home: Scaffold(body: child),
         ),
       ),
@@ -158,5 +159,19 @@ void main() {
     await pump(tester, const SelfieReviewView(), const Size(1180, 900));
     await expectLater(find.byType(SelfieReviewView),
         matchesGoldenFile('selfie_review_light.png'));
+  });
+
+  testWidgets('approval queue — desktop dark', (tester) async {
+    await pump(tester, const ApprovalQueueView(), const Size(1180, 1100),
+        theme: AppTheme.dark());
+    await expectLater(find.byType(ApprovalQueueView),
+        matchesGoldenFile('approval_queue_dark.png'));
+  });
+
+  testWidgets('selfie review — desktop dark', (tester) async {
+    await pump(tester, const SelfieReviewView(), const Size(1180, 900),
+        theme: AppTheme.dark());
+    await expectLater(find.byType(SelfieReviewView),
+        matchesGoldenFile('selfie_review_dark.png'));
   });
 }

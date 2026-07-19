@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/network/dio_client.dart';
 import 'core/router/app_router.dart';
+import 'core/router/app_routes.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'features/auth/cubit/auth_cubit.dart';
@@ -69,13 +70,21 @@ class _Za2zo2aAdminAppState extends State<Za2zo2aAdminApp> {
         BlocProvider<NavCountsCubit>.value(value: di.sl<NavCountsCubit>()),
       ],
       child: BlocListener<AuthCubit, AuthState>(
-        // The router's refreshListenable + redirect guard drives navigation on
-        // every auth transition (login → dashboard, logout/401 → login) — see
-        // AppRouter and the login_flow_test that pins this. This listener only
-        // primes the sidebar badge counts when a session starts.
+        // The router's redirect guard already reacts to auth changes, but we
+        // also navigate explicitly so a sign-out (or a 401) lands on /login
+        // immediately and reliably in the real browser, and a login lands on
+        // the dashboard. Both targets match the guard, so it's idempotent.
         listenWhen: (a, b) => a.status != b.status,
         listener: (context, state) {
-          if (state.isAuthenticated) di.sl<NavCountsCubit>().load();
+          switch (state.status) {
+            case AuthStatus.authenticated:
+              di.sl<NavCountsCubit>().load();
+              _appRouter.router.go(AppRoutes.dashboard);
+            case AuthStatus.unauthenticated:
+              _appRouter.router.go(AppRoutes.login);
+            case AuthStatus.unknown:
+              break;
+          }
         },
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, mode) {

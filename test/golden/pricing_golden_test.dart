@@ -66,20 +66,28 @@ void main() {
 
   tearDownAll(() => GetIt.instance.reset());
 
-  testWidgets('pricing control — desktop light', (tester) async {
+  Future<void> pump(WidgetTester tester, ThemeData theme) async {
     tester.view.physicalSize = const Size(1180, 1100);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-
     await tester.pumpWidget(MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
+      theme: theme,
       home: const Scaffold(body: PricingView()),
     ));
     await tester.pumpAndSettle();
+  }
 
+  testWidgets('pricing control — desktop light', (tester) async {
+    await pump(tester, AppTheme.light());
     await expectLater(
         find.byType(PricingView), matchesGoldenFile('pricing_light.png'));
+  });
+
+  testWidgets('pricing control — desktop dark', (tester) async {
+    await pump(tester, AppTheme.dark());
+    await expectLater(
+        find.byType(PricingView), matchesGoldenFile('pricing_dark.png'));
   });
 }

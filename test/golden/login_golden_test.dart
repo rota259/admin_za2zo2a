@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:za2zo2a_admin/core/network/dio_client.dart';
 import 'package:za2zo2a_admin/core/services/session_manager.dart';
 import 'package:za2zo2a_admin/core/theme/app_theme.dart';
+import 'package:za2zo2a_admin/core/util/ambient_motion.dart';
 import 'package:za2zo2a_admin/features/auth/cubit/auth_cubit.dart';
 import 'package:za2zo2a_admin/features/auth/data/repos/auth_repo.dart';
 import 'package:za2zo2a_admin/features/auth/views/login_view.dart';
@@ -52,15 +53,16 @@ Future<void> _loadBundledFonts() async {
 
 void main() {
   setUpAll(() async {
+    AmbientMotion.enabled = false;
     await _loadBundledFonts();
 
     // flutter_secure_storage talks to a platform channel that doesn't exist in
     // the test harness — stub it so SessionManager/AuthRepo can be built.
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
-      (call) async => call.method == 'readAll' ? <String, String>{} : null,
-    );
+          const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+          (call) async => call.method == 'readAll' ? <String, String>{} : null,
+        );
   });
 
   Widget harness({required ThemeData theme}) {

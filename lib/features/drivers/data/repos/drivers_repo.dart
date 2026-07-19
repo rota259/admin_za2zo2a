@@ -3,6 +3,15 @@ import '../../../../core/network/api_error.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/repository_base.dart';
 import '../models/driver_model.dart';
+import '../models/driver_verification.dart';
+
+/// A driver's full detail: the driver plus their latest selfie verification
+/// (null if none on record).
+class DriverDetailData {
+  const DriverDetailData({required this.driver, this.verification});
+  final DriverModel driver;
+  final DriverVerification? verification;
+}
 
 /// One page of the driver list plus its pagination.
 class DriverPage {
@@ -90,16 +99,20 @@ class DriversRepo with RepositoryBase {
     return unwrap(res).integer(['pagination.total']) ?? 0;
   }
 
-  /// `GET /api/admin/drivers/:id` → the full driver (latestSelfie handled by
-  /// the selfie feature, ignored here).
-  Future<DriverModel> detail(String id) async {
+  /// `GET /api/admin/drivers/:id` → the full driver plus its latest selfie
+  /// verification (`latestSelfie`).
+  Future<DriverDetailData> detail(String id) async {
     return guard(() async {
       final res = await _client.dio.get(ApiEndpoints.adminDriver(id));
-      final driver = unwrap(res).mapField(['driver']);
+      final data = unwrap(res);
+      final driver = data.mapField(['driver']);
       if (driver == null) {
         throw const ApiError('Driver not found.', statusCode: 404);
       }
-      return DriverModel.fromJson(driver);
+      return DriverDetailData(
+        driver: DriverModel.fromJson(driver),
+        verification: DriverVerification.fromJson(data.mapField(['latestSelfie'])),
+      );
     });
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_dimens.dart';
 import '../../../core/theme/app_tokens.dart';
+import '../../../core/widgets/cursor_glow.dart';
 import 'widgets/login_brand_panel.dart';
 import 'widgets/login_form.dart';
 
@@ -22,27 +23,39 @@ class LoginView extends StatelessWidget {
         builder: (context, constraints) {
           final showBrand = constraints.maxWidth >= AppSizes.tabletBreakpoint;
 
-          if (!showBrand) {
-            return const Center(
+          // The form side's neutral space carries a soft crimson glow that
+          // trails the cursor — the animated crimson panel on the left already
+          // has its own ambient motion.
+          final formSide = CursorGlow(
+            color: t.accent,
+            opacity: 0.14,
+            radius: 520,
+            child: const Center(
               child: SingleChildScrollView(
-                padding: EdgeInsets.all(AppSpacing.xxxl),
+                padding: EdgeInsets.all(40),
                 child: LoginForm(),
+              ),
+            ),
+          );
+
+          if (!showBrand) {
+            return CursorGlow(
+              color: t.accent,
+              opacity: 0.09,
+              radius: 520,
+              child: const Center(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(AppSpacing.xxxl),
+                  child: LoginForm(),
+                ),
               ),
             );
           }
 
           return Row(
-            children: const [
-              Expanded(flex: 105, child: LoginBrandPanel()),
-              Expanded(
-                flex: 95,
-                child: Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(40),
-                    child: LoginForm(),
-                  ),
-                ),
-              ),
+            children: [
+              const Expanded(flex: 105, child: LoginBrandPanel()),
+              Expanded(flex: 95, child: formSide),
             ],
           );
         },

@@ -1,12 +1,12 @@
 {
-    "name": "za2zo2a_admin",
-    "short_name": "za2zo2a_admin",
+    "name": "Za2zo2a Operator Console",
+    "short_name": "Za2zo2a Admin",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#f6f6f4",
+    "theme_color": "#E8194B",
+    "description": "Za2zo2a operator console — manage drivers, approvals, selfie checks and pricing.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

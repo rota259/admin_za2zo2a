@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/network/api_error.dart';
 import '../data/models/driver_document.dart';
 import '../data/models/driver_model.dart';
+import '../data/models/driver_verification.dart';
 import '../data/repos/drivers_repo.dart';
 
 part 'driver_detail_state.dart';
@@ -35,9 +36,12 @@ class DriverDetailCubit extends Cubit<DriverDetailState> {
   Future<void> load() async {
     emit(state.copyWith(status: DetailStatus.loading, clearError: true));
     try {
+      final data = await _repo.detail(driverId);
       emit(state.copyWith(
         status: DetailStatus.ready,
-        driver: await _repo.detail(driverId),
+        driver: data.driver,
+        verification: data.verification,
+        clearVerification: data.verification == null,
       ));
     } on ApiError catch (e) {
       emit(state.copyWith(status: DetailStatus.error, error: e.message));
@@ -80,7 +84,12 @@ class DriverDetailCubit extends Cubit<DriverDetailState> {
     try {
       await action();
       final fresh = await _repo.detail(driverId);
-      emit(busy(false).copyWith(driver: fresh, status: DetailStatus.ready));
+      emit(busy(false).copyWith(
+        driver: fresh.driver,
+        verification: fresh.verification,
+        clearVerification: fresh.verification == null,
+        status: DetailStatus.ready,
+      ));
       _results.add(ActionResult(ok));
     } on ApiError catch (e) {
       emit(busy(false));

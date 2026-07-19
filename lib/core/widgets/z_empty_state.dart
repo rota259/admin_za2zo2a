@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_dimens.dart';
 import '../theme/app_tokens.dart';
+import 'pulse_icon_tile.dart';
 import 'z_button.dart';
 
 /// The design's empty state — soft accent icon tile, title, subtitle.
@@ -33,16 +34,12 @@ class ZEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: t.accentSoft,
-                borderRadius: BorderRadius.circular(AppRadii.lg),
-              ),
-              child: Icon(icon, color: t.accent, size: 26),
+            PulseIconTile(
+              icon: icon,
+              color: t.accent,
+              background: t.accentSoft,
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
             Text(title, style: theme.textTheme.headlineSmall),
             if (message != null) ...[
               const SizedBox(height: AppSpacing.sm),
@@ -86,17 +83,12 @@ class ZErrorState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: t.danger.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppRadii.lg),
-              ),
-              child: Icon(Icons.warning_amber_rounded,
-                  color: t.danger, size: 26),
+            PulseIconTile(
+              icon: Icons.warning_amber_rounded,
+              color: t.danger,
+              background: t.danger.withValues(alpha: 0.12),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.sm),
             Text('Something went wrong', style: theme.textTheme.headlineSmall),
             const SizedBox(height: AppSpacing.sm),
             Text(
