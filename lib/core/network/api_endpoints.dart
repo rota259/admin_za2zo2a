@@ -47,11 +47,18 @@ class ApiEndpoints {
   static String adminRiderBlock(String id) => '/api/admin/riders/$id/block';
 
   // ── Trips ───────────────────────────────────────────────────────────────
+  /// `GET ?type=active|history` (omit for all), confirmed live via the
+  /// project's Postman collection ("Watch Active Trips" / "View Trip
+  /// History" / "View All Trips"). No fare-override endpoint exists yet.
   static const String adminTrips = '/api/admin/trips';
   static String adminTrip(String id) => '/api/admin/trips/$id';
-  static String adminTripFare(String id) => '/api/admin/trips/$id/fare';
+
+  // ── Vehicles ────────────────────────────────────────────────────────────
+  /// Confirmed live ("View Registered Cars") but not yet wired to a screen.
+  static const String adminCars = '/api/admin/cars';
 
   // ── Settings ────────────────────────────────────────────────────────────
+  /// Not yet live on the backend — no route in the Postman collection.
   static const String adminSettings = '/api/admin/settings';
 
   // ── Service zones ───────────────────────────────────────────────────────

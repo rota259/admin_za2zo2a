@@ -16,10 +16,9 @@ import '../../shell/views/widgets/admin_page.dart';
 import '../cubit/trip_detail_cubit.dart';
 import '../data/models/trip_model.dart';
 import '../data/repos/trips_repo.dart';
-import 'widgets/trip_fare_override_dialog.dart';
 
 /// Trip detail. Owns a [TripDetailCubit] scoped to [tripId] — full detail,
-/// not owner-scoped, plus the manual fare-override action.
+/// not owner-scoped. Read-only: no fare-override endpoint exists yet.
 class TripDetailView extends StatelessWidget {
   const TripDetailView({super.key, required this.tripId});
 
@@ -34,29 +33,8 @@ class TripDetailView extends StatelessWidget {
   }
 }
 
-class _TripDetailBody extends StatefulWidget {
+class _TripDetailBody extends StatelessWidget {
   const _TripDetailBody();
-
-  @override
-  State<_TripDetailBody> createState() => _TripDetailBodyState();
-}
-
-class _TripDetailBodyState extends State<_TripDetailBody> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<TripDetailCubit>().results.listen((r) {
-      if (!mounted) return;
-      final t = context.tokens;
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(r.message),
-          backgroundColor: r.isError ? t.danger : t.toastBg,
-          behavior: SnackBarBehavior.floating,
-        ));
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +68,7 @@ class _TripDetailBodyState extends State<_TripDetailBody> {
                       onRetry: cubit.load,
                     ),
                   ),
-                DetailStatus.ready => _Content(state: state, cubit: cubit),
+                DetailStatus.ready => _Content(state: state),
               };
             },
           ),
@@ -101,10 +79,9 @@ class _TripDetailBodyState extends State<_TripDetailBody> {
 }
 
 class _Content extends StatelessWidget {
-  const _Content({required this.state, required this.cubit});
+  const _Content({required this.state});
 
   final TripDetailState state;
-  final TripDetailCubit cubit;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +92,7 @@ class _Content extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         _PeopleCard(trip: trip),
         const SizedBox(height: AppSpacing.lg),
-        _FareCard(trip: trip, state: state, cubit: cubit),
+        _FareCard(trip: trip),
       ],
     );
     final right = _TimelineCard(trip: trip);
@@ -290,18 +267,15 @@ class _PeopleCard extends StatelessWidget {
 }
 
 class _FareCard extends StatelessWidget {
-  const _FareCard({required this.trip, required this.state, required this.cubit});
+  const _FareCard({required this.trip});
 
   final TripModel trip;
-  final TripDetailState state;
-  final TripDetailCubit cubit;
 
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
     final theme = Theme.of(context);
     final fare = trip.fare;
-    final canOverride = trip.status != 'cancelled';
 
     return ZCard(
       child: Column(
@@ -371,21 +345,6 @@ class _FareCard extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: AppSpacing.lg),
-          Tooltip(
-            message: canOverride
-                ? ''
-                : 'Cancelled trips cannot have their fare overridden.',
-            child: ZButton(
-              label: 'Override fare',
-              icon: Icons.edit_note,
-              variant: ZButtonVariant.secondary,
-              loading: state.busyFare,
-              onPressed: canOverride && !state.busyFare
-                  ? () => _override(context)
-                  : null,
-            ),
-          ),
         ],
       ),
     );
@@ -406,14 +365,6 @@ class _FareCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _override(BuildContext context) async {
-    final result = await TripFareOverrideDialog.show(
-      context,
-      currentTotal: trip.fare.total,
-    );
-    if (result != null) cubit.overrideFare(result.$1, result.$2);
   }
 }
 

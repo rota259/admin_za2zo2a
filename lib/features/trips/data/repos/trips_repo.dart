@@ -19,34 +19,28 @@ class TripPage {
   final int total;
 }
 
-/// Live totals per status filter, for the tab counters. Each maps to one
-/// genuine backend `?status=` value — no client-side combining of statuses.
+/// Live totals per `type` filter, for the tab counters.
 class TripCounts {
-  const TripCounts({
-    this.all = 0,
-    this.requested = 0,
-    this.accepted = 0,
-    this.inProgress = 0,
-    this.completed = 0,
-    this.cancelled = 0,
-  });
+  const TripCounts({this.all = 0, this.active = 0, this.history = 0});
   final int all;
-  final int requested;
-  final int accepted;
-  final int inProgress;
-  final int completed;
-  final int cancelled;
+  final int active;
+  final int history;
 }
 
-/// Every admin trip operation, per `docs/backend-admin-api-spec.md` §2.
+/// Every admin trip operation, confirmed live via the project's Postman
+/// collection ("Watch Active Trips" / "View Trip History" / "View All Trips"
+/// / "Get Trip Details"). The list filter is `?type=active|history` (omit for
+/// all) — not the `?status=<TripStatus>` shape an earlier internal spec doc
+/// assumed. There is no fare-override endpoint.
 class TripsRepo with RepositoryBase {
   TripsRepo(this._client);
 
   final DioClient _client;
 
-  /// `GET /api/admin/trips?status=&page=&limit=`. [status] null → all trips.
+  /// `GET /api/admin/trips?type=&page=&limit=`. [type] null → all trips,
+  /// `'active'` → in-flight trips, `'history'` → finished trips.
   Future<TripPage> list({
-    String? status,
+    String? type,
     int page = 1,
     int limit = 20,
   }) async {
@@ -54,7 +48,7 @@ class TripsRepo with RepositoryBase {
       final res = await _client.dio.get(
         ApiEndpoints.adminTrips,
         queryParameters: {
-          'status': ?status,
+          'type': ?type,
           'page': page,
           'limit': limit,
         },
@@ -74,33 +68,22 @@ class TripsRepo with RepositoryBase {
     });
   }
 
-  /// Tab counters — a `limit=1` fetch per filter, run in parallel so we pay
-  /// for the totals, not the rows.
+  /// Tab counters — a `limit=1` fetch per filter, run in parallel.
   Future<TripCounts> counts() async {
     return guard(() async {
       final results = await Future.wait([
-        _total(status: null),
-        _total(status: 'requested'),
-        _total(status: 'accepted'),
-        _total(status: 'in_progress'),
-        _total(status: 'completed'),
-        _total(status: 'cancelled'),
+        _total(type: null),
+        _total(type: 'active'),
+        _total(type: 'history'),
       ]);
-      return TripCounts(
-        all: results[0],
-        requested: results[1],
-        accepted: results[2],
-        inProgress: results[3],
-        completed: results[4],
-        cancelled: results[5],
-      );
+      return TripCounts(all: results[0], active: results[1], history: results[2]);
     });
   }
 
-  Future<int> _total({String? status}) async {
+  Future<int> _total({String? type}) async {
     final res = await _client.dio.get(
       ApiEndpoints.adminTrips,
-      queryParameters: {'status': ?status, 'limit': 1},
+      queryParameters: {'type': ?type, 'limit': 1},
     );
     return unwrap(res).integer(['pagination.total']) ?? 0;
   }
@@ -115,24 +98,6 @@ class TripsRepo with RepositoryBase {
         throw const ApiError('Trip not found.', statusCode: 404);
       }
       return TripModel.fromJson(trip);
-    });
-  }
-
-  /// `PATCH /api/admin/trips/:id/fare` — manual fare override. `409` if the
-  /// trip is cancelled.
-  Future<TripModel> overrideFare({
-    required String id,
-    required double total,
-    required String reason,
-  }) async {
-    return guard(() async {
-      final res = await _client.dio.patch(
-        ApiEndpoints.adminTripFare(id),
-        data: {'total': total, 'reason': reason},
-      );
-      final data = unwrap(res);
-      final trip = data.mapField(['trip']);
-      return trip == null ? await detail(id) : TripModel.fromJson(trip);
     });
   }
 }

@@ -7,7 +7,8 @@ import '../data/repos/trips_repo.dart';
 
 part 'trips_list_state.dart';
 
-/// Owns the trips-list screen: current status filter, page, rows and counts.
+/// Owns the trips-list screen: current type filter (all/active/history), page,
+/// rows and counts.
 class TripsListCubit extends Cubit<TripsListState> {
   TripsListCubit(this._repo) : super(const TripsListState());
 
@@ -16,7 +17,7 @@ class TripsListCubit extends Cubit<TripsListState> {
   Future<void> load() async {
     emit(state.copyWith(status: ListStatus.loading, clearError: true));
     try {
-      final page = await _repo.list(status: state.filter.query, page: 1);
+      final page = await _repo.list(type: state.filter.query, page: 1);
       emit(state.copyWith(
         status: ListStatus.ready,
         trips: page.trips,
@@ -55,7 +56,7 @@ class TripsListCubit extends Cubit<TripsListState> {
   Future<void> _fetchPage(int page) async {
     emit(state.copyWith(status: ListStatus.loading, clearError: true));
     try {
-      final result = await _repo.list(status: state.filter.query, page: page);
+      final result = await _repo.list(type: state.filter.query, page: page);
       emit(state.copyWith(
         status: ListStatus.ready,
         trips: result.trips,

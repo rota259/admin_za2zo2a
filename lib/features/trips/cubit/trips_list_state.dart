@@ -1,14 +1,12 @@
 part of 'trips_list_cubit.dart';
 
-/// The filter tabs. `all` sends no status param; the rest map 1:1 to real
-/// `TripStatus` enum values the backend accepts.
+/// The filter tabs — confirmed live via the Postman collection: `all` sends
+/// no `type` param, `active`/`history` map 1:1 to the backend's `?type=`
+/// values ("Watch Active Trips" / "View Trip History").
 enum TripFilter {
   all('All', null),
-  requested('Requested', 'requested'),
-  accepted('Accepted', 'accepted'),
-  inProgress('In progress', 'in_progress'),
-  completed('Completed', 'completed'),
-  cancelled('Cancelled', 'cancelled');
+  active('Active', 'active'),
+  history('History', 'history');
 
   const TripFilter(this.label, this.query);
   final String label;
@@ -44,11 +42,8 @@ class TripsListState extends Equatable {
 
   int countFor(TripFilter f) => switch (f) {
         TripFilter.all => counts.all,
-        TripFilter.requested => counts.requested,
-        TripFilter.accepted => counts.accepted,
-        TripFilter.inProgress => counts.inProgress,
-        TripFilter.completed => counts.completed,
-        TripFilter.cancelled => counts.cancelled,
+        TripFilter.active => counts.active,
+        TripFilter.history => counts.history,
       };
 
   TripsListState copyWith({
