@@ -4,6 +4,7 @@ import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/widgets/z_button.dart';
 import '../../../../core/widgets/z_card.dart';
+import '../../../../core/widgets/z_reason_dialog.dart';
 import '../../../../core/widgets/z_text_field.dart';
 import '../../cubit/notif_compose_cubit.dart';
 import 'notif_selectors.dart';
@@ -34,6 +35,14 @@ class NotifComposeCard extends StatelessWidget {
           Text('Audience', style: theme.textTheme.titleLarge),
           const SizedBox(height: AppSpacing.md),
           NotifAudienceGrid(current: state.target, onSelect: cubit.setTarget),
+          if (state.target == NotifTarget.single) ...[
+            const SizedBox(height: AppSpacing.lg),
+            ZTextField(
+              label: 'Recipient user ID',
+              hint: 'Mongo _id of the rider/driver to notify',
+              onChanged: cubit.setUserId,
+            ),
+          ],
           const SizedBox(height: AppSpacing.xl),
           Text('Type', style: theme.textTheme.titleSmall),
           const SizedBox(height: 7),
@@ -74,18 +83,14 @@ class NotifComposeCard extends StatelessWidget {
                   style: theme.textTheme.bodySmall?.copyWith(color: t.text2),
                 ),
               ),
-              // No admin send endpoint yet — present-but-inert, tooltip explains.
-              Tooltip(
-                message: 'Sending is not available yet — the backend needs a '
-                    '"send notification" endpoint (see the integration spec).',
-                child: Opacity(
-                  opacity: 0.55,
-                  child: ZButton(
-                    label: 'Send notification',
-                    icon: Icons.send,
-                    size: ZButtonSize.small,
-                  ),
-                ),
+              ZButton(
+                label: 'Send notification',
+                icon: Icons.send,
+                size: ZButtonSize.small,
+                loading: state.isSending,
+                onPressed: state.isValid && !state.isSending
+                    ? () => _confirmSend(context)
+                    : null,
               ),
             ],
           ),
@@ -98,4 +103,16 @@ class NotifComposeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadii.md),
         borderSide: BorderSide(color: c, width: w),
       );
+
+  Future<void> _confirmSend(BuildContext context) async {
+    final ok = await ZReasonDialog.show(
+      context,
+      icon: Icons.send,
+      title: 'Send this notification?',
+      body: 'It goes out immediately to ${state.target.label.toLowerCase()} '
+          'as a push notification and an in-app message.',
+      confirmLabel: 'Send',
+    );
+    if (ok != null) cubit.send();
+  }
 }

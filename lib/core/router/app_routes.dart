@@ -11,12 +11,16 @@ class AppRoutes {
   static const String approval = '/approval';
   static const String selfie = '/selfie';
   static const String riders = '/riders';
+  static const String riderDetail = '/riders/:id';
   static const String trips = '/trips';
+  static const String tripDetail = '/trips/:id';
   static const String pricing = '/pricing';
   static const String notifications = '/notifications';
   static const String settings = '/settings';
 
   static String driverDetailFor(String id) => '/drivers/$id';
+  static String riderDetailFor(String id) => '/riders/$id';
+  static String tripDetailFor(String id) => '/trips/$id';
 }
 
 /// One sidebar entry. Mirrors the design's `navDef` array, with the crumb
@@ -33,9 +37,10 @@ class NavItem {
   final String label;
   final IconData icon;
 
-  /// False for sections whose backend endpoints don't exist yet (Stage 0
-  /// found no routes for riders, trips, notifications or settings). They stay
-  /// visible but inert rather than leading to a fake screen.
+  /// False for sections whose backend endpoints don't exist yet. They stay
+  /// visible but inert rather than leading to a fake screen. As of the admin
+  /// API rollout (riders, trips, notifications send/history, settings), every
+  /// section is wired live.
   final bool enabled;
 
   static const List<NavItem> all = [
@@ -63,13 +68,11 @@ class NavItem {
       path: AppRoutes.riders,
       label: 'Riders',
       icon: Icons.people_outline,
-      enabled: false,
     ),
     NavItem(
       path: AppRoutes.trips,
       label: 'Trips',
       icon: Icons.route_outlined,
-      enabled: false,
     ),
     NavItem(
       path: AppRoutes.pricing,
@@ -85,7 +88,6 @@ class NavItem {
       path: AppRoutes.settings,
       label: 'Settings',
       icon: Icons.settings_outlined,
-      enabled: false,
     ),
   ];
 
@@ -93,6 +95,12 @@ class NavItem {
   static String titleFor(String location) {
     if (location.startsWith('/drivers/') && location.length > 9) {
       return 'Driver detail';
+    }
+    if (location.startsWith('/riders/') && location.length > 8) {
+      return 'Rider detail';
+    }
+    if (location.startsWith('/trips/') && location.length > 7) {
+      return 'Trip detail';
     }
     return all
         .firstWhere(

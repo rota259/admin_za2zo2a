@@ -74,7 +74,6 @@ class NotifPreview extends StatelessWidget {
   }
 
   Color _tone(AppTokens t, NotifKind kind) => switch (kind) {
-        NotifKind.info => t.info,
         NotifKind.promo => t.accent,
         NotifKind.warning => t.warning,
       };

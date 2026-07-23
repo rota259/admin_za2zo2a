@@ -33,6 +33,17 @@ class ZBadge extends StatelessWidget {
         const ZBadge(label: 'Pending review', tone: ZBadgeTone.warning),
       'blocked' => const ZBadge(label: 'Blocked', tone: ZBadgeTone.danger),
       'active' => const ZBadge(label: 'Active', tone: ZBadgeTone.success),
+      // Trip lifecycle statuses (`TripStatus` on the backend).
+      'requested' => const ZBadge(label: 'Requested', tone: ZBadgeTone.info),
+      'matching' => const ZBadge(label: 'Matching', tone: ZBadgeTone.info),
+      'accepted' => const ZBadge(label: 'Accepted', tone: ZBadgeTone.accent),
+      'driver_en_route' =>
+        const ZBadge(label: 'Driver en route', tone: ZBadgeTone.accent),
+      'arrived' => const ZBadge(label: 'Arrived', tone: ZBadgeTone.accent),
+      'in_progress' =>
+        const ZBadge(label: 'In progress', tone: ZBadgeTone.warning),
+      'completed' => const ZBadge(label: 'Completed', tone: ZBadgeTone.success),
+      'cancelled' => const ZBadge(label: 'Cancelled', tone: ZBadgeTone.danger),
       _ => ZBadge(label: status, tone: ZBadgeTone.neutral),
     };
   }

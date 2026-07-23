@@ -9,7 +9,7 @@ class ApiEndpoints {
 
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://192.168.1.10:3000',
+    defaultValue: 'http://192.168.1.2:3000',
   );
 
   // ── Admin auth ──────────────────────────────────────────────────────────
@@ -36,6 +36,37 @@ class ApiEndpoints {
   static const String adminSelfieChecks = '/api/admin/selfie-checks';
   static String adminSelfieCheckReview(String id) =>
       '/api/admin/selfie-checks/$id/review';
+
+  // ── Notifications (admin) ──────────────────────────────────────────────
+  /// POST → send/broadcast. GET → sent history (paginated).
+  static const String adminNotifications = '/api/admin/notifications';
+
+  // ── Riders ──────────────────────────────────────────────────────────────
+  static const String adminRiders = '/api/admin/riders';
+  static String adminRider(String id) => '/api/admin/riders/$id';
+  static String adminRiderBlock(String id) => '/api/admin/riders/$id/block';
+
+  // ── Trips ───────────────────────────────────────────────────────────────
+  static const String adminTrips = '/api/admin/trips';
+  static String adminTrip(String id) => '/api/admin/trips/$id';
+  static String adminTripFare(String id) => '/api/admin/trips/$id/fare';
+
+  // ── Settings ────────────────────────────────────────────────────────────
+  static const String adminSettings = '/api/admin/settings';
+
+  // ── Service zones ───────────────────────────────────────────────────────
+  static const String adminZones = '/api/admin/zones';
+  static String adminZone(String id) => '/api/admin/zones/$id';
+
+  // ── Support tickets ─────────────────────────────────────────────────────
+  static const String adminSupportTickets = '/api/admin/support-tickets';
+  static String adminSupportTicket(String id) =>
+      '/api/admin/support-tickets/$id';
+  static String adminSupportTicketReplies(String id) =>
+      '/api/admin/support-tickets/$id/replies';
+
+  // ── Audit log ───────────────────────────────────────────────────────────
+  static const String adminAudit = '/api/admin/audit';
 
   // ── Health ──────────────────────────────────────────────────────────────
   static const String health = '/health';
