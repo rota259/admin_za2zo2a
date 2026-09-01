@@ -9,6 +9,28 @@ dark mode.
 
 ---
 
+## 🗺️ Where it fits
+
+```mermaid
+flowchart LR
+    Admin["🖥️ Admin Panel<br/>(this repo — Flutter Web)"]
+    API["🛰️ Backend API<br/>/api/admin/*"]
+    DB[("🍃 MongoDB")]
+    Apps["📱 Rider & Driver Apps"]
+
+    Admin -->|REST| API
+    Apps -->|REST · WebSocket| API
+    API --> DB
+```
+
+Operators manage riders, drivers, trips, pricing and **driver‑document
+verification** here; the same backend serves the live mobile apps.
+
+- 🛰️ Backend → [za2zoo2a-backend](https://github.com/rota259/za2zoo2a-backend)
+- 📱 Mobile apps → [Za2zo2a](https://github.com/rota259/Za2zo2a)
+
+---
+
 ## Quick start (development)
 
 ```bash
