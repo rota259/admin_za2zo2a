@@ -127,3 +127,6 @@ Search boxes, the notification bell, "Invite driver", "Export", "Forgot
 password", and the profile-menu "Account settings"/"Activity log" are rendered
 per the design but intentionally **inert with an explanatory tooltip** where no
 endpoint exists — never a control that silently does nothing.
+
+## 📄 License
+Released under the [MIT License](LICENSE).
