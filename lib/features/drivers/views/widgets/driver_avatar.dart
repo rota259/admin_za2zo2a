@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/network/media_url.dart';
+
 /// Gradient initials avatar, per the design's `avatar()` — the gradient hue is
 /// picked deterministically from the name so a given driver always looks the
 /// same. If a Cloudinary [photoUrl] exists it's shown instead.
@@ -48,7 +50,7 @@ class DriverAvatar extends StatelessWidget {
       alignment: Alignment.center,
       child: (photoUrl != null && photoUrl!.isNotEmpty)
           ? Image.network(
-              photoUrl!,
+              mediaUrl(photoUrl)!,
               width: size,
               height: size,
               fit: BoxFit.cover,

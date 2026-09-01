@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/network/media_url.dart';
+
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_tokens.dart';
 import '../../../../core/widgets/z_badge.dart';
@@ -78,7 +80,7 @@ class DocumentTile extends StatelessWidget {
           alignment: Alignment.center,
           child: document.hasImage
               ? Image.network(
-                  document.url!,
+                  mediaUrl(document.url)!,
                   height: 130,
                   width: double.infinity,
                   fit: BoxFit.cover,

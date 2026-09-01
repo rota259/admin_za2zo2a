@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/network/media_url.dart';
+
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_tokens.dart';
 
@@ -41,7 +43,7 @@ class SelfiePhoto extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: (url != null && url!.isNotEmpty)
-                ? Image.network(url!,
+                ? Image.network(mediaUrl(url)!,
                     fit: BoxFit.cover,
                     errorBuilder: (_, _, _) => _placeholder(t))
                 : _placeholder(t),
